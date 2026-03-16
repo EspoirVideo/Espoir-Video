@@ -24,7 +24,7 @@ const Login = () => {
 
     setLoading(true);
     try {
-      await api.post('/auth/register', { phone });
+      await api.post('/auth/send-otp', { phone });
       setStep(2);
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de l\'envoi du code.');
