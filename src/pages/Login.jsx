@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { Phone, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { Phone, Lock, Loader2, AlertCircle, X } from 'lucide-react';
 
 const Login = () => {
-  const [step, setStep] = useState(1); // 1 = Phone, 2 = OTP
+  const [step, setStep] = useState(1);
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,6 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Etape 1 : Demander le code OTP
   const handleRequestOTP = async (e) => {
     e.preventDefault();
     setError('');
@@ -25,7 +24,6 @@ const Login = () => {
 
     setLoading(true);
     try {
-      // Appel a la route d'inscription/connexion du backend
       await api.post('/auth/register', { phone });
       setStep(2);
     } catch (err) {
@@ -35,7 +33,6 @@ const Login = () => {
     }
   };
 
-  // Etape 2 : Verifier le code OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setError('');
@@ -47,13 +44,9 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await api.post('/auth/verify', { phone, otp });
-      
       const { user, accessToken } = response.data.data;
       
-      // On met a jour le contexte global
       login(user, accessToken);
-      
-      // On redirige vers l'accueil
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Code invalide ou expire.');
@@ -63,9 +56,19 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-surface rounded-xl shadow-2xl p-8 border border-border">
-        <div className="text-center mb-8">
+    <div className="flex justify-center items-center min-h-[80vh] px-4 sm:px-6">
+      <div className="relative w-full max-w-md bg-surface rounded-xl shadow-2xl p-6 sm:p-8 border border-border">
+        
+        {/* Bouton Fermer (X) */}
+        <button
+          onClick={() => navigate('/')}
+          className="absolute top-4 right-4 text-textMuted hover:text-textMain transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1"
+          aria-label="Fermer"
+        >
+          <X className="h-6 w-6" />
+        </button>
+
+        <div className="text-center mb-8 mt-2">
           <h2 className="text-3xl font-extrabold text-textMain tracking-tight">
             {step === 1 ? 'Connexion' : 'Verification'}
           </h2>
@@ -77,8 +80,8 @@ const Login = () => {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-error bg-opacity-10 border border-error rounded flex items-center gap-2 text-error text-sm">
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <div className="mb-6 p-3 bg-error/10 border border-error rounded-lg flex items-center gap-2 text-error text-sm">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -98,8 +101,8 @@ const Login = () => {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-border bg-background text-textMain focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
-                  placeholder="Numero de telephone (ex: 0707070707)"
+                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-background text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all"
+                  placeholder="Numero (ex: 0707070707)"
                 />
               </div>
             </div>
@@ -107,7 +110,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Recevoir le code'}
             </button>
@@ -128,7 +131,7 @@ const Login = () => {
                   maxLength="4"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-border bg-background text-textMain focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors tracking-[1em] font-bold text-center"
+                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-background text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all tracking-[1em] font-bold text-center"
                   placeholder="••••"
                 />
               </div>
@@ -137,7 +140,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Verifier et se connecter'}
             </button>
@@ -146,7 +149,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-sm text-textMuted hover:text-primary transition-colors"
+                className="text-sm text-textMuted hover:text-textMain transition-colors"
               >
                 Modifier le numero
               </button>
