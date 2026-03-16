@@ -43,7 +43,8 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const response = await api.post('/auth/verify', { phone, otp });
+      // CORRECTION : Alignement strict avec la route backend (/verify-otp au lieu de /verify)
+      const response = await api.post('/auth/verify-otp', { phone, otp });
       const { user, accessToken } = response.data.data;
       
       login(user, accessToken);
@@ -59,7 +60,6 @@ const Login = () => {
     <div className="flex justify-center items-center min-h-[80vh] px-4 sm:px-6">
       <div className="relative w-full max-w-md bg-surface rounded-xl shadow-2xl p-6 sm:p-8 border border-border">
         
-        {/* Bouton Fermer (X) */}
         <button
           onClick={() => navigate('/')}
           className="absolute top-4 right-4 text-textMuted hover:text-textMain transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1"
